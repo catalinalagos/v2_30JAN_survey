@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question 1</title>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <script src="../p5.min.js"></script>
+  <script src="sketch3.js"></script>
+</head>
+
+<body>
+  <main>
+    <h2 class="title">Question 3</h2>
+  </main>
+  <div class="all">
+    <textarea id="source" rows="8"> </textarea>
+    <a>
+        <button class="button button1">Send</button>
+      </a>
+    <div id="result"></div>
+    
+  </div>
+  
+
+
+  <script>
+    //define where to get the source and place the result
+    const source = document.getElementById('source');
+    const result = document.getElementById('result');
+    var words = [];
+
+
+    // while listening inputHandler
+    const inputHandler = function (e) {
+      //place inside html
+      //result.innerHTML = e.target.value;
+      //get words from string
+      words = e.target.value.split(' ');
+      //each word creates a representation
+    }
+    console.log(words);
+    
+    source.addEventListener('input', inputHandler);
+    source.addEventListener('propertychange', inputHandler);
+    
+  </script>
+</body>
+
+</html>

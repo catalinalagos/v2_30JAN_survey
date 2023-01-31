@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question 1</title>
+
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+  </head>
+  <script src="../p5.min.js"></script>
+  <script src="sketch1.js"></script>
+</head>
+
+<body>
+  <main>
+    <h3 class="title">Has the university affected your mental health (either positively or negatively)? How do you
+      notice it? </h3>
+  </main>
+
+  <div class="all">
+    <textarea id="source" rows="8"> </textarea>
+    <a href="question2.html">
+      <button class="button button1">Submit</button>
+    </a>
+    <div id="result"></div>
+
+  </div>
+
+
+
+  <script>
+    //define where to get the source and place the result
+    const source = document.getElementById('source');
+    //const result = document.getElementById('result');
+    // --------------------- VARIABLES ---------------------
+    //for storing words
+    var words = [];
+    var wordsStr = "";
+
+    //for storing keywords
+    var allColors = [];
+    var allKeywords = [];
+    var allEmotions = [];
+    var counts = {};
+    var keycounts = {};
+    var posnegBckg = 0;
+    var emotionsMulti = [];
+    var colorsMulti = [];
+    var socialPeersExist = false;
+    var socialEntExist = false;
+
+
+
+    // --------------------- LISTENING ---------------------
+    // while listening inputHandler (this is a sort of loop)
+    const inputHandler = function (e) {
+      //get words from string
+      words = e.target.value.split(' '); //to store tokens in an array
+      wordsStr = e.target.value; //to save the string
+      //I'll just use them all in lower case
+      wordsStr = wordsStr.toLowerCase();
+      console.log(words);
+
+      // --------------------- CHECK EMOTIONS ---------------------
+      // I check emotions differently because the array has color in [0]
+      //reset arrays
+      allEmotions = [];
+      allColors = [];
+      //check every emotion
+      for (var a = 0; a < emotionkeywords.length; a++) {
+        for (var i = 1; i < emotionkeywords[a].length; i++) {
+
+          //if it is mentioned and NOT stored --> push, count = 1
+          if (wordsStr.includes(emotionkeywords[a][i]) && !allEmotions.includes(emotionkeywords[a][i])) {
+            counts[emotionkeywords[a][i]] = 1;
+            allEmotions.push(emotionkeywords[a][i]);
+            allColors.push((emotionkeywords[a][0]));
+          }
+          //if it is mentioned and stored --> increase count
+          if (wordsStr.includes(emotionkeywords[a][i]) && allEmotions.includes(emotionkeywords[a][i])) {
+            var counter = wordsStr.split(emotionkeywords[a][i]);
+            counter = counter.length - 1;
+            counts[emotionkeywords[a][i]] = counter;
+          }
+        }
+      }
+      // --------------------- CHECK OTHER KEYWORDS ---------------------
+      //reset array allKeywords bc this is sort of a loop
+      allKeywords = [];
+      for (var a = 0; a < keywords.length; a++) {
+        for (var i = 0; i < keywords[a].length; i++) {
+          //Mentioned and not stored in "allKeywords":
+          if (wordsStr.includes(keywords[a][i]) && !allKeywords.includes(keywords[a][i])) {
+            allKeywords.push((keywords[a][i]));
+            keycounts[(keywords[a][i])] = 1;
+          }
+          if (wordsStr.includes(keywords[a][i]) && allKeywords.includes(keywords[a][i])) {
+            var counter = wordsStr.split(keywords[a][i]);
+            counter = counter.length - 1;
+            keycounts[keywords[a][i]] = counter;
+          }
+
+        }
+      }
+
+
+      //---------------AFTER ITERATING THROUGH ALL THE TEXT NOW WE CAN DO SOME ANALYSIS--------------
+
+      //------------SEARCH EMOTIONS AND COUNTS--------------
+      emotionsMulti = [];
+      colorsMulti = [];
+      for (let k in counts) {
+        for (let i = 0; i < counts[k]; i++) {
+          emotionsMulti.push(k);
+          var index = allEmotions.indexOf(k);
+          colorsMulti.push(allColors[index]);
+        }
+      }
+      console.log(emotionsMulti);
+
+      //---------SEARCH POS/NEG TO CHECK BACKGROUND COLOR-------
+      var totalPos = 0;
+      var totalNeg = 0;
+      posnegBckg = 0;
+      for (let a = 0; a < positiveWords.length; a++) {
+        if (allKeywords.includes(positiveWords[a])) {
+          totalPos += keycounts[positiveWords[a]];
+        }
+      }
+      for (let a = 0; a < negativeWords.length; a++) {
+        if (allKeywords.includes(negativeWords[a])) {
+          totalNeg = keycounts[negativeWords[a]];
+        }
+      }
+      posnegBckg = posnegBckg + totalPos * 60 - totalNeg * 80
+      //--------------------------------------------------------
+
+      // ----------------------- SOCIAL PEERS -------------------
+      socialPeersExist = false;
+      for (let a = 0; a < socialPeers.length; a++) {
+        if (allKeywords.includes(socialPeers[a])) {
+          socialPeersExist = true;
+        }
+      }
+      socialEntExist = false;
+      for (let a = 0; a < socialEntities.length; a++) {
+        if (allKeywords.includes(socialEntities[a])) {
+          socialEntExist = true;
+        }
+      }
+
+
+
+
+    } //End of listening
+
+
+    source.addEventListener('input', inputHandler);
+    source.addEventListener('propertychange', inputHandler);
+
+    // ---------------------------- EMOTIONS & COLORS DEFINITION ----------------------
+    //Keywords that set colors: emotions typology (TU Delft)
+    //lists [color, keywords]
+    //hardcoded stemma
+    var negativeEmotionsList1 = [
+      [191, 43, 33], 'anger', 'angry', 'indign', 'resent', 'annoy', 'dissatisf', 'frustr', "freak out" , 'irritab','bad mood'
+    ];
+    var negativeEmotionsList2 = [
+      [211, 113, 110], 'contempt', 'hate', 'disgust'
+    ];
+    var negativeEmotionsList3 = [
+      [230, 172, 163], 'bore', 'reluct', 'mental'
+    ];
+    var negativeEmotionsList4 = [
+      [139, 97, 147], 'sad', 'disappoint', 'pity', 'belittl'
+    ];
+    var negativeEmotionsList5 = [
+      [135, 68, 132], 'lonel', 'reject', 'humili', 'longing', 'envy', 'jealous', 'guilt', 'regret'
+    ];
+    var negativeEmotionsList6 = [
+      [89, 56, 130], 'shame', 'embarrass', 'disgust','self-esteem','self-confidence', 'lack of', 'less capable'
+    ];
+    var negativeEmotionsList7 = [
+      [35, 59, 141], 'fear', 'startle', 'worry', 'affected','hurt'
+    ];
+    var negativeEmotionsList8 = [
+      [59, 114, 165], 'anxi', 'distrust', 'doubt', 'nervous', 'insecur', 'question' ,'hypersensiti' 
+    ];
+    var negativeEmotionsList9 = [
+      [55, 137, 189], 'distress', 'stress', 'despera','pressur', 'difficult', 'less motiva'
+    ];
+    var negativeEmotionsList10 = [
+      [108, 170, 222], 'confus', 'shock', 'exaggera', 'misunderstan'
+    ];
+    var positiveEmotionsList1 = [
+      [156, 224, 213], 'amuse', 'schadenfreude', 'pleasure', 'seren', 'organiz'
+    ];
+    var positiveEmotionsList2 = [
+      [107, 212, 184], 'relief', 'satisfaction', 'euphoria', 'productive'
+    ];
+    var positiveEmotionsList3 = [
+      [91, 184, 156], 'happy-for', 'lust', 'affection', 'tenderness'
+    ];
+    var positiveEmotionsList4 = [
+      [74, 150, 119], 'elevation', 'gratitude', 'grateful', 'worship', 'admir', 'moved','enjoy'
+    ];
+    var positiveEmotionsList5 = [
+      [251, 223, 77], 'pride', 'proud', 'motivat'
+    ];
+    var positiveEmotionsList6 = [
+      [244, 172, 60], 'determination', 'fascination', 'positive surprise', 'inspiration', 'awe'
+    ];
+    var positiveEmotionsList7 = [
+      [238, 120, 51], 'excitement', 'hope'
+    ];
+    //ALL EMOTIONS IN ONE ARRAY "emotionkeywords": 
+    var emotionkeywords = [negativeEmotionsList1, negativeEmotionsList2, negativeEmotionsList3, negativeEmotionsList4,
+      negativeEmotionsList5, negativeEmotionsList6, negativeEmotionsList7, negativeEmotionsList8,
+      negativeEmotionsList9, negativeEmotionsList10, positiveEmotionsList1, positiveEmotionsList2,
+      positiveEmotionsList3, positiveEmotionsList4, positiveEmotionsList5, positiveEmotionsList6,
+      positiveEmotionsList7
+    ];
+
+
+
+    // ---------------------------- OTHER RELEVANT KEYWORDS DEFINITION ----------------------
+    // other keywords
+    // This list can be increased. Just remember to update array "keywords"
+    var socialPeers = ['social', 'colleague', 'group', 'friends'];
+    var socialEntities = ['professor', 'the School', 'coordin', 'program'];
+    var positiveWords = ['positiv', 'better', 'good', 'best'];
+    var negativeWords = ['negativ', 'worse', 'bad', 'worst'];
+
+    //ALL OTHER KEYWORDS IN ONE ARRAY:
+    var keywords = [socialPeers, socialEntities, positiveWords, negativeWords];
+  </script>
+</body>
+
+</html>
